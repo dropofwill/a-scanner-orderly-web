@@ -12,7 +12,7 @@ process.env.PWD = process.cwd();
 var app = express();
 
 // view engine setup
-app.set('views', path.join(process.env.PWD, 'views'));
+app.set('views', path.resolve(path.join(process.env.PWD, 'views')));
 app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
