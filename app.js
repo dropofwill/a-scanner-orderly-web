@@ -22,7 +22,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(require('node-compass')({mode: 'expanded'}));
-app.use(express.static('public'));
+app.use(express.static(path.join(process.env.PWD, 'public')));
 
 app.use('/', routes);
 app.use('/users', users);
