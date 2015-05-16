@@ -20,7 +20,7 @@ Client <-> Server via `socket.io`
 Baudrate 9600
 
 - Drink Selected: Arduino -> Server -> Client
-  * `new:[0-3],[0-3]`, e.g `new:1,2` 
+  * `new?1=[0-3]?2=[0-3]`, e.g `new?1=1,2=3` 
   * Where the ordered pair is the index of the color for drink and mixer respectively
   * Trigger: two colors selected, via double tap
 - Order Started: Client -> Server -> Arduino
