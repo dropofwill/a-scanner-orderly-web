@@ -12,6 +12,7 @@ process.env.PWD = process.cwd();
 var app = express();
 
 // view engine setup
+app.use(express.static(path.join(process.env.PWD, 'public')));
 app.set('views', path.resolve(path.join(process.env.PWD, 'views')));
 app.set('view engine', 'jade');
 
@@ -22,7 +23,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(require('node-compass')({mode: 'expanded'}));
-app.use(express.static(path.join(process.env.PWD, 'public')));
 
 app.use('/', routes);
 app.use('/users', users);
