@@ -1,15 +1,18 @@
 var express = require('express');
+var app = express();
+
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
 process.env.PWD = process.cwd();
-
-var app = express();
+var port = process.env.PORT || process.env.NODE_PORT || 3000;
 
 // view engine setup
 app.use(express.static(path.join(process.env.PWD, 'public')));
@@ -33,6 +36,23 @@ app.use(function(req, res, next) {
   err.status = 404;
   next(err);
 });
+/////////////////////////////////////
+//SOCKET IO STUFF
+/////////////////////////////////////
+io.on('connection', function(socket){
+  //Handles begin event from client
+  socket.on('begin', function(data){
+
+  });
+  //Handles ready event from client
+  socket.on('ready', function(data){
+
+  });
+});
+/** EMIT THESE
+ * New
+ * End
+ */
 
 // error handlers
 
