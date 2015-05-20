@@ -17,15 +17,37 @@ var connected = false;
 serialport.list(function (err, ports) {
   ports.forEach(function(port) {
     console.log(port.comName);
-    console.log(port);
+
+      p = new SerialPort(port.comName, {
+        baudrate: 9600,
+        parser: serialport.parsers.readline("\r\n")
+      });
+
+      try {
+        p.on('error', function(e) { console.log(e); });
+      }
+      catch (e) {
+        console.log(e);
+      }
+
+      p.open(function (error) {
+        if (error) {
+          console.log("Couldn't connect to: " + port.comName);
+        }
+        else {
+          p.on('data', function (data) {
+            console.log(data);
+          });
+        }
+      });
   });
 });
 
 // open the serial port. Change the name to the name of your port, just like in Processing and Arduino:
-var myPort = new SerialPort(portName, {
-  // look for return and newline at the end of each data packet:
-  parser: serialport.parsers.readline("\r\n")
-});
+// var myPort = new SerialPort(portName, {
+//   // look for return and newline at the end of each data packet:
+//   parser: serialport.parsers.readline("\r\n")
+// });
 
 // respond to web GET requests with the index.html page:
 app.get('/', function (request, response) {
@@ -45,19 +67,19 @@ io.sockets.on('connection', function (socket) {
   // }
 
   // if the client disconnects:
-  socket.on('disconnect', function () {
-    myPort.write('x');
-    console.log('user disconnected');
-    connected = false;
-  });
-
-  // listen for new serial data:
-  myPort.on('data', function (data) {
-    // Convert the string into a JSON object:
-    var serialData = JSON.parse(data);
-    // for debugging, you should see this in the terminal window:
-    console.log(data);
-    // send a serial event to the web client with the data:
-    socket.emit('serialEvent', serialData);
-  });
+  // socket.on('disconnect', function () {
+  //   myPort.write('x');
+  //   console.log('user disconnected');
+  //   connected = false;
+  // });
+  //
+  // // listen for new serial data:
+  // myPort.on('data', function (data) {
+  //   // Convert the string into a JSON object:
+  //   var serialData = JSON.parse(data);
+  //   // for debugging, you should see this in the terminal window:
+  //   console.log(data);
+  //   // send a serial event to the web client with the data:
+  //   socket.emit('serialEvent', serialData);
+  // });
 });
