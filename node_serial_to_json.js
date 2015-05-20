@@ -23,12 +23,7 @@ serialport.list(function (err, ports) {
         parser: serialport.parsers.readline("\r\n")
       });
 
-      try {
-        p.on('error', function(e) { console.log(e); });
-      }
-      catch (e) {
-        console.log(e);
-      }
+      p.on('error', function(e) { console.log(e); });
 
       p.open(function (error) {
         if (error) {
@@ -37,11 +32,25 @@ serialport.list(function (err, ports) {
         else {
           p.on('data', function (data) {
             console.log(data);
+            if (is_a_scanner(data)) {
+              p.flush();
+              // send a byte to the serial port to ask for data:
+              p.write('$');
+            }
           });
         }
       });
   });
 });
+
+function is_a_scanner(data) {
+  if (data == "connect") {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
 
 // open the serial port. Change the name to the name of your port, just like in Processing and Arduino:
 // var myPort = new SerialPort(portName, {
