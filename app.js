@@ -52,6 +52,7 @@ io.on('connection', function(socket){
 /** EMIT THESE
  * New
  * End
+ * io.emit('end', data);
  */
 
 // error handlers

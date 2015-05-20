@@ -18,4 +18,3 @@ serial.on("open", function () {
     console.log("res " + res);
   });
 });
-

@@ -1,5 +1,12 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  div#container
+  	header A Scanner Darkly
+  	section#order-list
+  		span#mixer
+  		span#alcohohol
+  		div#orders
+block scripts
+    script(src="/socket.io/socket.io.js")
+    script(src="./client.js")
