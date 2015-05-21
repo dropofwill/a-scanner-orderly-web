@@ -9,13 +9,12 @@ var io           = require('socket.io')(http);
 var routes = require('./routes/index');
 
 var connected    = false,
+    color_array  = ["label-warning", "label-success", "label-primary"],
     spirit_array = ["Vodka", "Gin", "Rum"],
     mixer_array  = ["Lemon Lime Soda", "Orange Juice", "Cranberry Juice"];
 
 process.env.PWD = process.cwd();
 var port = process.env.PORT || process.env.NODE_PORT || 3000;
-
-
 
 // view engine setup
 app.use(express.static(path.join(process.env.PWD, 'public')));
@@ -23,7 +22,7 @@ app.set('views', path.resolve(path.join(process.env.PWD, 'views')));
 app.set('view engine', 'jade');
 
 app.get('/', function(req, res){
-  //the html string being sent
+  // the html string being sent
   var filepath = path.resolve(__dirname + '/views/index.html');
   res.sendFile(filepath);
 });
@@ -43,6 +42,7 @@ io.on('connection', function(socket){
   socket.on('begin', function(data){
     begin_drink_response(port);
   });
+
   //Handles ready event from client
   socket.on('ready', function(data){
     ready_drink_response(port);
@@ -73,11 +73,6 @@ serialport.list(function (err, ports) {
       }
       else {
         p.on('data', function (data) {
-          /*
-           * "connecting"
-           * "new"
-           * "ready"
-           */
           console.log(data);
 
           if (is_a_scanner(data)) {
@@ -91,10 +86,10 @@ serialport.list(function (err, ports) {
             close_response(p);
             io.emit("new", processed_data);
           }
-          else if (is_drink_ready(data)) {
+          else if (was_drink_delivered(data)) {
             var finish = true;
             // send finish to the view with socket.io
-            // TODO
+            io.emit('end', { id: port_to_id(port) } );
             close_response(p);
           }
         });
@@ -152,10 +147,16 @@ function ready_drink_response(port){
   port.write(']');
 }
 
+function port_to_id(port) {
+  port.comName.split("/").pop().split(".").pop();
+}
+
 function convert_drink_response(port, data) {
-  return { "id":     port.comName.split("/").pop().split(".").pop(),
-           "spirit": spirit_array[data[0]],
-           "mixer":  mixer_array[data[1]] };
+  return { "id":           port_to_id(port),
+           "spirit":       spirit_array[data[0]],
+           "spirit_class": color_array[data[0]],
+           "mixer":        mixer_array[data[1]],
+           "mixer_class":  color_array[data[1]]};
 }
 
 function is_a_scanner(data) {
@@ -183,8 +184,8 @@ function is_drink_order(data) {
   }
 }
 
-function is_drink_ready(data) {
-  if (data === "ready") {
+function was_drink_delivered(data) {
+  if (data === "delivered") {
     return true;
   }
   else {

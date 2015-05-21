@@ -7,8 +7,8 @@ var ordersDiv = document.querySelector('#orders');
 socket.on('new', function(data) {
 	var order = "";
 	order += "<p class='order' id='"+data.id+"'>";
-	order += "<span class='col-item label label-primary'>"+data.spirit+"</span>";
-	order += "<span class='col-item label label-success'>"+data.mixer+"</span>";
+	order += "<span class='col-item label "+ data.spirit_class + "'>"+data.spirit+"</span>";
+	order += "<span class='col-item label "+ data.mixer_class  + "'>"+data.mixer+"</span>";
 	order += "<button class='control btn btn-default'>Begin</button>";
 	order += "</p>";
 	ordersDiv.innerHTML += order;
@@ -45,6 +45,8 @@ var order = "";
 var but = document.querySelector('#'+'butt'+' .control');
 	but.addEventListener('click', drink_button_click);
 */
-socket.on('end', function(data){
+socket.on('end', function(data) {
 	//remove element at data.id
+	elem = document.getElementById(data.id);
+	elem.parentNode.removeChild(elem);
 });
