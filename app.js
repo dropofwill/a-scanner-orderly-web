@@ -41,7 +41,7 @@ app.use(function(req, res, next) {
 io.on('connection', function(socket){
   //Handles begin event from client
   socket.on('begin', function(data){
-    
+
   });
   //Handles ready event from client
   socket.on('ready', function(data){
@@ -51,7 +51,13 @@ io.on('connection', function(socket){
 
 // Loop over all available serial ports looking for open-able data ports
 serialport.list(function (err, ports) {
-  ports.forEach(function(port) {
+  non_bluetooth_ports = ports.filter(function (el) {
+    console.log(el.comName);
+    if (el.comName.indexOf("Bluetooth") > 0) return false;
+    else return true;
+  });
+  console.log(non_bluetooth_ports);
+  non_bluetooth_ports.forEach(function(port) {
     console.log(port.comName);
 
     p = new SerialPort(port.comName, {
@@ -67,23 +73,29 @@ serialport.list(function (err, ports) {
       }
       else {
         p.on('data', function (data) {
+          /*
+           * "connecting"
+           * "new"
+           * "ready"
+           */
           console.log(data);
 
           if (is_a_scanner(data)) {
-            close_response();
+            close_response(p);
           }
           else if (is_drink_order(data)) {
             var drink = JSON.parse(data).drink;
             // send drink to the view with socket.io
             var processed_data = convert_drink_response(port, drink);
+            console.log(processed_data);
+            close_response(p);
             io.emit("new", processed_data);
-            close_response();
           }
           else if (is_drink_ready(data)) {
             var finish = true;
             // send finish to the view with socket.io
             // TODO
-            close_response();
+            close_response(p);
           }
         });
       }
@@ -131,9 +143,9 @@ function close_response(port) {
 }
 
 function convert_drink_response(port, data) {
-  return { "id":     port.comName,
-           "spirit": data[0],
-           "mixer":  data[1] };
+  return { "id":     port.comName.split("/").pop().split(".").pop(),
+           "spirit": spirit_array[data[0]],
+           "mixer":  mixer_array[data[1]] };
 }
 
 function is_a_scanner(data) {
