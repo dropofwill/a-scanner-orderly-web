@@ -11,9 +11,10 @@ var routes = require('./routes/index');
 var connected    = false,
     color_array  = ["label-warning", "label-success", "label-primary"],
     spirit_array = ["Vodka", "Gin", "Rum"],
-    mixer_array  = ["Lemon Lime Soda", "Orange Juice", "Cranberry Juice"];
+    mixer_array  = ["Cranberry Juice", "Lemon Lime Soda", "Orange Juice"];
 
 process.env.PWD = process.cwd();
+var port_object = {};
 var port = process.env.PORT || process.env.NODE_PORT || 3000;
 
 // view engine setup
@@ -40,12 +41,14 @@ app.use(function(req, res, next) {
 io.on('connection', function(socket){
   //Handles begin event from client
   socket.on('begin', function(data){
-    begin_drink_response(port);
+    console.log(data.port);
+    begin_drink_response(port_object[data.port]);
   });
 
   //Handles ready event from client
   socket.on('ready', function(data){
-    ready_drink_response(port);
+    console.log(data.port);
+    ready_drink_response(port_object[data.port]);
   });
 });
 
@@ -64,6 +67,8 @@ serialport.list(function (err, ports) {
       baudrate: 9600,
       parser: serialport.parsers.readline("\r\n")
     });
+
+    port_object[port.comName] = p;
 
     p.on('error', function(e) { console.log(e); });
 
@@ -148,11 +153,12 @@ function ready_drink_response(port){
 }
 
 function port_to_id(port) {
-  port.comName.split("/").pop().split(".").pop();
+  return port.comName.split("/").pop().split(".").pop();
 }
 
 function convert_drink_response(port, data) {
   return { "id":           port_to_id(port),
+           "port":         port.comName,
            "spirit":       spirit_array[data[0]],
            "spirit_class": color_array[data[0]],
            "mixer":        mixer_array[data[1]],

@@ -6,10 +6,10 @@ var ordersDiv = document.querySelector('#orders');
 
 socket.on('new', function(data) {
 	var order = "";
-	order += "<p class='order' id='"+data.id+"'>";
+	order += "<p class='order' id='"+data.id+"''>";
 	order += "<span class='col-item label "+ data.spirit_class + "'>"+data.spirit+"</span>";
 	order += "<span class='col-item label "+ data.mixer_class  + "'>"+data.mixer+"</span>";
-	order += "<button class='control btn btn-default'>Begin</button>";
+	order += "<button class='control btn btn-default' data-port='"+data.port+"'>Begin</button>";
 	order += "</p>";
 	ordersDiv.innerHTML += order;
 
@@ -24,13 +24,13 @@ function drink_button_click(e) {
 			e.target.innerHTML = "Ready";
 			e.target.classList.remove('btn-default');
 			e.target.classList.add('btn-warning');
-			socket.emit('begin', {});
+			socket.emit('begin', {port: e.target.dataset.port});
 			break;
 		case "Ready":
 			e.target.innerHTML = "Done";
 			e.target.classList.remove('btn-warning');
 			e.target.classList.add('btn-danger');
-			socket.emit('ready', {});
+			socket.emit('ready', {port: e.target.dataset.port});
 			break;
 	}
 }
