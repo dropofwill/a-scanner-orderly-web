@@ -41,11 +41,11 @@ app.use(function(req, res, next) {
 io.on('connection', function(socket){
   //Handles begin event from client
   socket.on('begin', function(data){
-
+    begin_drink_response(port);
   });
   //Handles ready event from client
   socket.on('ready', function(data){
-
+    ready_drink_response(port);
   });
 });
 
@@ -140,6 +140,16 @@ app.use(function(err, req, res, next) {
 function close_response(port) {
   port.flush();
   port.write('$');
+}
+
+function begin_drink_response(port){
+  port.flush();
+  port.write('[');
+}
+
+function ready_drink_response(port){
+  port.flush();
+  port.write(']');
 }
 
 function convert_drink_response(port, data) {
