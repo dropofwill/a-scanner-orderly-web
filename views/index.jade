@@ -1,13 +1,18 @@
 extends layout
 
 block content
-  div#container
+  div.jumbotron.container
     h1 A Scanner Darkly
-    section#order-list
-      span#mixer(class="col-title")
-      span#alcohohol(class="col-title")
-      div#orders
+    h2
+      span(class="label label-primary col-title") Drink
+      span(class="label label-success col-title") Mixer
+    div#orders
+      p#butt(class="order")
+        span(class="col-item label label-primary") Tequila
+        span(class="col-item label label-success") Sprite
+        button#butter(class="button btn btn-default") Begin
 
 block scripts
   script(src="/socket.io/socket.io.js")
+  script(src="http://code.jquery.com/jquery-migrate-1.2.1.min.js")
   script(src="./client.js")

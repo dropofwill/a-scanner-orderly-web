@@ -6,13 +6,12 @@ var serialport = require("serialport"),				    // include the serialport library
 
 // /dev/tty.usbmodemfd121
 // /dev/tty.usbmodemfd131
-var portName = '/dev/tty.usbmodemfd121';
-// print out the port you're listening on
-console.log("opening serial port: " + portName);
 
 server.listen(8080);
 console.log("Listening for new clients on port 8080");
 var connected = false;
+var spirit_array = ["Vodka", "Gin", "Rum"];
+var mixer_array = ["Lemon Lime Soda", "Orange Juice", "Cranberry Juice"];
 
 serialport.list(function (err, ports) {
   ports.forEach(function(port) {
@@ -32,10 +31,22 @@ serialport.list(function (err, ports) {
         else {
           p.on('data', function (data) {
             console.log(data);
+
             if (is_a_scanner(data)) {
-              p.flush();
-              // send a byte to the serial port to ask for data:
-              p.write('$');
+              close_response();
+            }
+            else if (is_drink_order(data)) {
+              var drink = JSON.parse(data).drink;
+              // send drink to the view with socket.io
+              processed_data = convert_drink_response(port, data);
+              io.emit("new", processed_data);
+              close_response();
+            }
+            else if (is_drink_ready(data)) {
+              var finish = true;
+              // send finish to the view with socket.io
+              // TODO
+              close_response();
             }
           });
         }
@@ -43,8 +54,20 @@ serialport.list(function (err, ports) {
   });
 });
 
+// send a byte to the serial port to tell it that we're done
+function close_response(port) {
+  port.flush();
+  port.write('$');
+}
+
+function convert_drink_response(port, data) {
+  return { "id":     port.comName,
+           "spirit": data[0],
+           "mixer":  data[1] };
+}
+
 function is_a_scanner(data) {
-  if (data == "connect") {
+  if (data === "connect") {
     return true;
   }
   else {
@@ -52,11 +75,30 @@ function is_a_scanner(data) {
   }
 }
 
-// open the serial port. Change the name to the name of your port, just like in Processing and Arduino:
-// var myPort = new SerialPort(portName, {
-//   // look for return and newline at the end of each data packet:
-//   parser: serialport.parsers.readline("\r\n")
-// });
+function is_drink_order(data) {
+  try {
+    json_res = JSON.parse(data);
+  }
+  catch (e) {
+    return false;
+  }
+
+  if (typeof json_res.drink !== "undefined") {
+    return true;
+  }
+  else  {
+    return false;
+  }
+}
+
+function is_drink_ready(data) {
+  if (data === "ready") {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
 
 // respond to web GET requests with the index.html page:
 app.get('/', function (request, response) {

@@ -1,18 +1,50 @@
 var socket;
 socket = io.connect( window.location.origin, {query: 'bar', type: 'desktop'});
-var ordersDiv = document.querSelector('#orders');
+var ordersDiv = document.querySelector('#orders');
 
-socket.on('new', function(data){
+//console.log(socket);
+
+socket.on('new', function(data) {
 	var order = "";
-	order += "<div class='order' id='"+data.id+"'>";
-	order += "<span class='label'>"+data.drink+"</span>";
-	order += "<span class='label'>"+data.mixer+"</span>";
-	order += "<button class='control'>Begin</button>";
-	order += "</div>";
+	order += "<p class='order' id='"+data.id+"'>";
+	order += "<span class='col-item label label-primary'>"+data.spirit+"</span>";
+	order += "<span class='col-item label label-success'>"+data.mixer+"</span>";
+	order += "<button class='control btn btn-default'>Begin</button>";
+	order += "</p>";
 	ordersDiv.innerHTML += order;
+
+	var but = document.querySelector('#'+data.id+' .control');
+	but.addEventListener('click', drink_button_click);
 });
 
+function drink_button_click(e) {
+	var button_text = e.target.innerHTML;
+	switch(button_text) {
+		case "Begin":
+			e.target.innerHTML = "Ready";
+			e.target.classList.remove('btn-default');
+			e.target.classList.add('btn-warning');
+			socket.emit('begin', {});
+			break;
+		case "Ready":
+			e.target.innerHTML = "Done";
+			e.target.classList.remove('btn-warning');
+			e.target.classList.add('btn-danger');
+			socket.emit('ready', {});
+			break;
+	}
+}
+/////////////////////////////
+//DEMO CODE
+/////////////////////////////
+/*
+var order = "";
+	order += "<p id='butt' class='order'><span class='col-item label label-primary'>Tequila</span><span class='col-item label label-success'>Sprite</span><button id='butter' class='control btn btn-default'>Begin</button></p>"
+	ordersDiv.innerHTML += order;
+
+var but = document.querySelector('#'+'butt'+' .control');
+	but.addEventListener('click', drink_button_click);
+*/
 socket.on('end', function(data){
 	//remove element at data.id
-	
 });

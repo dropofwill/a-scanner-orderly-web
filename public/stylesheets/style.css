@@ -1,22 +1,30 @@
 body {
   padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
   color: #00B7FF;
 }
 
-#order-list{
-
+h1{
 }
 
-.col-title{
+.container{
+	padding: 10%;
+	margin: 0 auto;
+}
 
+.col-title {
+	width: 20%;
+	margin-right: 10%;
+}
+
+.col-item{
+  margin-right: 12%;
 }
 
 #orders{
-
+	padding: 5px;
 }
 
 .order{
