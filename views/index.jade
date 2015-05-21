@@ -2,11 +2,12 @@ extends layout
 
 block content
   div#container
-  	header A Scanner Darkly
-  	section#order-list
-  		span#mixer
-  		span#alcohohol
-  		div#orders
+    h1 A Scanner Darkly
+    section#order-list
+      span#mixer(class="col-title")
+      span#alcohohol(class="col-title")
+      div#orders
+
 block scripts
-    script(src="/socket.io/socket.io.js")
-    script(src="./client.js")
+  script(src="/socket.io/socket.io.js")
+  script(src="./client.js")
